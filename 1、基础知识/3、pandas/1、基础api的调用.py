@@ -13,4 +13,4 @@ df = pd.DataFrame({
 })
 
 # 1、选择指定数据类型的列
-print(df.select_dtypes(include=['bool']).columns)
+# print(df.select_dtypes(include=['bool']).columns)
