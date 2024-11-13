@@ -141,5 +141,58 @@ if __name__ == '__main__':
 
 * Q1：TrainMatrix不是一个数组吗，为什么P1Num可以直接相加，然后做除法；
   A1：这就是模拟了贝叶斯公式，p1Num
-* Q1：[1,0] + [0,1] 不是等于 [1,0,0,1]
-  A1：确实是这样，但是这里是np.array；np.array：[1,0] + [0,1] = [1,1]
+* Q2：[1,0] + [0,1] 不是等于 [1,0,0,1]
+  A2：确实是这样，但是这里是np.array；np.array：[1,0] + [0,1] = [1,1]
+* Q3：为什么对每条句子中出现的每个单词进行占比统计可以得到贝叶斯概率？得到每个向量中的每一个单词的概率后，怎样才能反应这个向量所对应的事情；
+  A3：这相当于是一个后验概率，已知该事件和其子事件发生数，反推每一个子事件发生的概率；（已知结果，推导过程，所以是后验概率；反向传播也是一种后验概率，通过已知信息反向调整对应里面的参数）
+
+【原理理解】
+
+* 随着某种类别对应的子事件的不断增多，对某个事情的分类也越来越清楚；
+  也就知道，当某件事发生时，最可能导致其发生的子事件是哪一件；
+
+【其他理解】
+
+* 贝叶斯和KNN属于早期的机器学习算法，通过不分类的情况，就可以达到较好的效果；
+
+##### part4
+
+【时间】11/13
+
+* 为了防止出现概率为0，采取了拉普拉斯平滑；
+  理解：事实上时间发生的概率不可能为0，只能无限趋近于0，但是不等于0；只能说事情发生的概率特别下，不能绝对地说某件事情一定不会发生；
+
+``` python
+import math
+def trainNB0(trainMatrix,trainCategory):
+    # trainMatrix:32
+    numTrainDocs = len(trainMatrix)
+    numWords = len(trainMatrix[0])     
+    pAbusive = sum(trainCategory)/float(numTrainDocs)    # 计算侮辱词汇所占的比例
+    #创建numpy.ones数组,词条出现数初始化为1，拉普拉斯平滑
+    p0Num = np.ones(numWords);p1Num=np.ones(numWords)
+    #分母初始化为2,拉普拉斯平滑
+    p0Denom = 2.0;p1Denom=2.0    # 定义分母
+    # 对于每一个训练的文档
+    for i in range(numTrainDocs):
+        if trainCategory[i] == 1:
+            # 这里加的是一个数组啊
+            ## p1Num
+            p1Num += trainMatrix[i]    # 统计每个词频出现的情况；
+            p1Denom += sum(trainMatrix[i])    # 统计分母，所有的分母
+        else:
+            p0Num += trainMatrix[i]
+            p0Denom += sum(trainMatrix[i])
+    p1Vect = np.log(p1Num / p1Denom)
+    p0Vect = np.log(p0Num / p0Denom)
+    return p0Vect,p1Vect,pAbusive
+```
+
+【理解】
+
+* 区别于普通的就是多了一个拉普拉斯操作核对数操作；
+  防止概率为0；
+
+### bayes2
+
+【时间】11/13
